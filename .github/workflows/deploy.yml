@@ -18,14 +18,29 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
-            set -e
+            set -euo pipefail
 
             REMOTE_DIR="${{ secrets.REMOTE_DIR }}"
             if [ -z "$REMOTE_DIR" ]; then
               REMOTE_DIR=/var/www/fcs
             fi
 
-            # Ensure git is available, clone or update repo
+            # Ensure directory exists
+            mkdir -p "$REMOTE_DIR"
+
+            # Install basic tools if missing (git, curl)
+            if ! command -v git >/dev/null 2>&1; then
+              sudo apt-get update
+              sudo apt-get install -y git curl
+            fi
+
+            # Install Node.js if missing (Node 18 LTS)
+            if ! command -v node >/dev/null 2>&1 || ! command -v npm >/dev/null 2>&1; then
+              curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+              sudo apt-get install -y nodejs
+            fi
+
+            # Clone or update repo into REMOTE_DIR
             if [ -d "$REMOTE_DIR/.git" ]; then
               cd "$REMOTE_DIR"
               git fetch --all
@@ -35,10 +50,11 @@ jobs:
               cd "$REMOTE_DIR"
             fi
 
-            # Install and build
-            npm ci --production
+            # Install dev dependencies, build, then prune to production
+            npm ci
             npm run build
+            npm prune --production || true
 
-            # Restart service (requires sudo rights)
+            # Restart systemd service (SSH user needs sudo privileges)
             sudo systemctl daemon-reload || true
             sudo systemctl restart fcs.service || sudo systemctl start fcs.service || true
