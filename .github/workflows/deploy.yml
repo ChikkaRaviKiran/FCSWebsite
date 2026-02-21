@@ -34,10 +34,14 @@ jobs:
               sudo apt-get install -y git curl
             fi
 
-            # Install Node.js if missing (Node 18 LTS)
+            # Install Node.js if missing (Node 18 LTS) and ensure npm exists
             if ! command -v node >/dev/null 2>&1 || ! command -v npm >/dev/null 2>&1; then
               curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
-              sudo apt-get install -y nodejs
+              sudo DEBIAN_FRONTEND=noninteractive apt-get install -y nodejs npm || sudo DEBIAN_FRONTEND=noninteractive apt-get install -y nodejs
+              # Ensure `node` symlink exists (some distros provide `nodejs` only)
+              if [ ! -x "/usr/bin/node" ] && [ -x "/usr/bin/nodejs" ]; then
+                sudo ln -sf /usr/bin/nodejs /usr/bin/node
+              fi
             fi
 
             # Clone or update repo into REMOTE_DIR
