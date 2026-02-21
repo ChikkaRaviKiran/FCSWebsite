@@ -1,0 +1,17 @@
+[Unit]
+Description=FCS Next.js application
+After=network.target
+
+[Service]
+Type=simple
+# Change 'www-data' to the user that should run the app (e.g., 'ubuntu')
+User=www-data
+WorkingDirectory=/var/www/fcs
+Environment=NODE_ENV=production
+ExecStart=/usr/bin/npm run start
+Restart=on-failure
+RestartSec=5
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,44 @@
+name: Deploy to Ubuntu Server
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy to server via SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            set -e
+
+            REMOTE_DIR="${{ secrets.REMOTE_DIR }}"
+            if [ -z "$REMOTE_DIR" ]; then
+              REMOTE_DIR=/var/www/fcs
+            fi
+
+            # Ensure git is available, clone or update repo
+            if [ -d "$REMOTE_DIR/.git" ]; then
+              cd "$REMOTE_DIR"
+              git fetch --all
+              git reset --hard origin/main
+            else
+              git clone https://github.com/${{ github.repository }} "$REMOTE_DIR"
+              cd "$REMOTE_DIR"
+            fi
+
+            # Install and build
+            npm ci --production
+            npm run build
+
+            # Restart service (requires sudo rights)
+            sudo systemctl daemon-reload || true
+            sudo systemctl restart fcs.service || sudo systemctl start fcs.service || true
