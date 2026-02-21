@@ -141,28 +141,37 @@ const Hero = () => {
 
         {/* Particles/Dots Animation */}
         <div className="absolute inset-0">
-          {isLoaded && [...Array(30)].map((_, i) => (
-            <motion.div
-              key={i}
-              className="absolute w-1 h-1 bg-white rounded-full"
-              initial={{
-                x: Math.random() * window.innerWidth,
-                y: Math.random() * window.innerHeight,
-                opacity: Math.random() * 0.5 + 0.2,
-              }}
-              animate={{
-                y: [null, Math.random() * window.innerHeight],
-                x: [null, Math.random() * window.innerWidth],
-                opacity: [null, Math.random() * 0.5 + 0.2, null],
-              }}
-              transition={{
-                duration: Math.random() * 15 + 15,
-                repeat: Infinity,
-                repeatType: 'reverse',
-                ease: 'linear',
-              }}
-            />
-          ))}
+          {isLoaded && [...Array(30)].map((_, i) => {
+            const startX = typeof window !== 'undefined' ? Math.random() * window.innerWidth : 0
+            const startY = typeof window !== 'undefined' ? Math.random() * window.innerHeight : 0
+            const endX = typeof window !== 'undefined' ? Math.random() * window.innerWidth : 0
+            const endY = typeof window !== 'undefined' ? Math.random() * window.innerHeight : 0
+            const startOpacity = Math.random() * 0.5 + 0.2
+            const midOpacity = Math.random() * 0.5 + 0.2
+
+            return (
+              <motion.div
+                key={i}
+                className="absolute w-1 h-1 bg-white rounded-full"
+                initial={{
+                  x: startX,
+                  y: startY,
+                  opacity: startOpacity,
+                }}
+                animate={{
+                  x: endX,
+                  y: endY,
+                  opacity: [startOpacity, midOpacity, startOpacity],
+                }}
+                transition={{
+                  duration: Math.random() * 15 + 15,
+                  repeat: Infinity,
+                  repeatType: 'reverse',
+                  ease: 'linear',
+                }}
+              />
+            )
+          })}
         </div>
       </div>
 
