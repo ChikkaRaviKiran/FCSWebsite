@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" role="img" aria-label="FCS logo">
+  <defs>
+    <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#06b6d4"/>
+      <stop offset="50%" stop-color="#8b5cf6"/>
+      <stop offset="100%" stop-color="#f472b6"/>
+    </linearGradient>
+  </defs>
+  <rect width="256" height="256" rx="32" fill="url(#g)"/>
+  <g transform="translate(40,48)">
+    <path d="M20 0 L80 0 L60 96 L20 96 Z" fill="#fff" opacity="0.05"/>
+    <text x="48" y="120" font-family="Inter, Arial, sans-serif" font-weight="700" font-size="72" fill="#fff" text-anchor="middle">FCS</text>
+  </g>
+</svg>
